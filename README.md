@@ -6,7 +6,7 @@ The visualizations are done with R as it has a rich set of packages on offer. Th
 2. Visualization (primarily ggplot2; exploring other useful packages too)   
 3. Detailed report with my observations and conclusions   
 
-Note: 
+** Note: **   
 1. Each folder contains required dataset (or source), a RMD (or R files/ project) and a report file (.MD)
 2. The report file (.MD format) can be referred for a quick look at the analysis and results
 3. Package requirements have been mentioned in respective reports
