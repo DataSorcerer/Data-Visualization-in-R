@@ -9,17 +9,8 @@ The fuel efficiency of cars is a matter of concern for many car owners. Everybod
 
 ``` r
 library(ggplot2)
-```
-
-    ## Warning: package 'ggplot2' was built under R version 3.4.3
-
-``` r
 library(ggcorrplot)
-```
-
-    ## Warning: package 'ggcorrplot' was built under R version 3.4.3
-
-``` r
+#Import mpg dataset from ggplot package
 cars <- ggplot2::mpg
 ```
 

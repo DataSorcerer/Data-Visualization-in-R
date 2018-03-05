@@ -18,9 +18,10 @@ The fuel efficiency of cars is a matter of concern for many car owners. Everybod
 
 ### Load the required packages
 
-```{r load, message=FALSE}
+```{r load, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(ggcorrplot)
+#Import mpg dataset from ggplot package
 cars <- ggplot2::mpg
 ```
 
@@ -28,6 +29,7 @@ cars <- ggplot2::mpg
 
 
 ```{r one, echo=FALSE}
+#Plot cars data with respect to displacement, highway mileage and category
 ggplot(data = cars) +
   geom_point(mapping = aes(x=displ, y=hwy, colour=class), size=3) + 
   xlab("Engine Displacement (L)") + ylab("Highway mileage (gallons/ L)")
