@@ -1,5 +1,5 @@
 ---
-title: "Fuel Economy of Cars"
+title: "Analysis of car fuel economies"
 output: rmarkdown::github_document
 ---
 
@@ -9,10 +9,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 The fuel efficiency of cars is a matter of concern for many car owners. Everybody loves to get the maximum returns till the last drop of fuel is exhausted! However, we also expect the car to be powerful enough to get us through daily city commute as well as those weekend drives over the highways. The fuel efficiency of the car depends upon variety of factors. Some of the factors that form motivation for this report are:
 1. How do different types of cars fare on highways, taking into consideration their engine displacement?
-2. How does number of cylinders in engine affect the highway performance in relation to engine displacement?
-3. How does city mileages of various cars compare with each other?
-4. Which cars return an above or below average mileages?
-5. What is degree of correlation between various factors that decide fuel economy?
+2. How do vehicles from different manufacturers stack up against each other in terms of fuel economy and engine displacement?   
+3. How does city mileages of various cars compare with respect to number of cylinders?   
+4. Which cars return an above or below average mileages?   
+5. How can cars be ranked on the basis of their city mileages?   
+
+Finally, we need to come up with a recommendation for new car buyers based on our analysis.
 
 **Data source:** The dataset used is Fuel economy data from 1999 and 2008 for 38 popular models of cars that the EPA makes available on http://fueleconomy.gov. Fuel economy data are the result of vehicle testing done at the Environmental Protection Agency's National Vehicle and Fuel Emissions Laboratory in Ann Arbor, Michigan, and by vehicle manufacturers with oversight by EPA.
 
@@ -27,7 +29,11 @@ cars <- ggplot2::mpg
 
 ### 1. How do different types of cars fare on highways, taking into consideration their engine displacement?
 
-
+**Observarions:**   
+1. Vehicles with lower engine displacement, seem to offer relatively more highway mileage   
+2. Most of the midsize and compact vehilces seem to be more fuel efficent than others   
+3. SUVs in general, are the least fuel efficient on highways, irrespective of engine displacement   
+4. _Interestingly_, there are few 2-seater vehicles that offer better fuel efficieny despite having high engine displacement 
 ```{r one, echo=FALSE}
 #Plot cars data with respect to displacement, highway mileage and category
 ggplot(data = cars) +
@@ -35,7 +41,12 @@ ggplot(data = cars) +
   xlab("Engine Displacement (L)") + ylab("Highway mileage (gallons/ L)")
 ```
 
-### 2. How does number of cylinders in engine affect the highway performance in relation to engine displacement?
+### 2. How do vehicles from different manufacturers stack up against each other in terms of fuel economy and engine displacement?
+
+**Observations: **    
+1. From the plot below, we observe a general trend that higher the engine displacment, lower the fuel efficiency on highway for all manufacturers.  
+2. Most of the Honda and Volkswagen cars have lower engine displacement, but high mileage on highways.   
+3. Landrovers and jeeps have generally powerful engines, but are less likely to be fuel efficient on highways
 
 ```{r cyl}
 ggplot(data = cars) +
@@ -45,4 +56,75 @@ ggplot(data = cars) +
 
 ```
 
+### 3. How does city mileages of various cars compare with each other? 
 
+Since, comparing city mileage of group of cars is our concern, mileages of groups of vehicles are plotted as a density function.   
+
+**Observations:**   
+1. City mileages of 4, 6 and 8 cylinder vehicles vary over 10-15 mpg, whereas 5 cyclinder vehicles have much smaller variablity of around 5 mpg
+2. 4 cylinder cars are most likely to be fuel efficent while 8 cylinder ones the least.
+
+```{r city, warning=FALSE, message=FALSE}
+#theme_set(theme_classic())
+
+# Plot
+g <- ggplot(mpg, aes(cty))
+g + geom_density(aes(fill=factor(cyl)), alpha=0.8) + 
+    labs(title="Fuel Efficiency as density plot", 
+         subtitle="City Mileage Grouped by Number of cylinders",
+         caption="Source: mpg",
+         x="City Mileage",
+         fill="# Cylinders")
+```
+
+### 4. Which cars return an above or below average mileages? 
+
+In order to show deviation around the mean city fuel economy, mpg is normalized initially. Next, the values are categorized and labelled as either below or above average. Finally, car names are taken as factors to retain the descending order of mileages above average and ascending order below average.
+
+```{r avg}
+# Data Prep
+data("mtcars")  # load data
+mtcars$`car name` <- rownames(mtcars)  # create new column for car names
+mtcars$mpg_normalized <- round((mtcars$mpg - mean(mtcars$mpg))/sd(mtcars$mpg), 2)  # compute normalized mpg
+mtcars$mpg_type <- ifelse(mtcars$mpg_normalized < 0, "below", "above")  # above / below avg flag
+mtcars <- mtcars[order(mtcars$mpg_normalized), ]  # sort
+mtcars$`car name` <- factor(mtcars$`car name`, levels = mtcars$`car name`)  # convert to factor to retain sorted order in plot.
+
+# Diverging Barcharts
+ggplot(mtcars, aes(x=`car name`, y=mpg_normalized, label=mpg_normalized)) + 
+  geom_bar(stat='identity', aes(fill=mpg_type), width=.5)  +
+  scale_fill_manual(name="Mileage", 
+                    labels = c("Above Average", "Below Average"), 
+                    values = c("above"="#00ba38", "below"="#f8766d")) + 
+  labs(title= "Deviation from mean city fuel efficiency") + 
+  coord_flip()
+```
+
+### 5. How can cars be ranked on the basis of their city mileages?   
+
+**Observations: **   
+1. Honda and Volkswagen are the best performing cars in cities
+2. Lincoln and Landrover have lowest fuel economies in cities
+
+```{r corr, message=FALSE, warning=FALSE}
+
+# Prepare data: group mean city mileage by manufacturer.
+cty_mpg <- aggregate(mpg$cty, by=list(mpg$manufacturer), FUN=mean)  # aggregate
+colnames(cty_mpg) <- c("make", "mileage")  # change column names
+cty_mpg <- cty_mpg[order(cty_mpg$mileage), ]  # sort
+cty_mpg$make <- factor(cty_mpg$make, levels = cty_mpg$make)  # to retain the order in plot.
+
+# Draw plot
+ggplot(cty_mpg, aes(x=make, y=mileage)) + 
+  geom_bar(stat="identity", width=.5, fill="tomato3") + 
+  labs(title="Car rankings by city mileages", 
+       subtitle="Car Vs Avg. Mileage", x="cars", y="Mileage (mpg)") + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6))
+```
+
+
+### Conclusion:
+
+Looking the various comparisons above, following recommendations can be made:   
+1. If the car is primarily going to be used for city commute and fuel efficieny is your concern, you must look to buy either Volkswagen or Honda cars   
+2. However, if your commute is going to involve city travel as well as fair bit of highway commute, then Pontiac vehicles seem be the best as they offer reasonably well fuel efficieny in both the scenarios, the best of both worlds!  
