@@ -7,7 +7,8 @@ The visualizations are done with R as it has a rich set of packages on offer. Th
  -  Detailed report with my observations and conclusions     
  
 ### Contents:   
-1. Air Quality in New York City
+1. Air Quality in New York City   
+2. Car Fuel Efficiency Analysis   
 
 
 ##### Note:   
