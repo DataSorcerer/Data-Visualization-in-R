@@ -35,3 +35,14 @@ ggplot(data = cars) +
   xlab("Engine Displacement (L)") + ylab("Highway mileage (gallons/ L)")
 ```
 
+### 2. How does number of cylinders in engine affect the highway performance in relation to engine displacement?
+
+```{r cyl}
+ggplot(data = cars) +
+  geom_point(mapping = aes(x=displ, y=hwy, colour=class), size=3) + 
+  facet_wrap(~manufacturer)+
+  xlab("Engine Displacement (L)") + ylab("Highway mileage (gallons/ L)")
+
+```
+
+
